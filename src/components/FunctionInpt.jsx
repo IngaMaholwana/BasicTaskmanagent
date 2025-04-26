@@ -1,128 +1,52 @@
-/* eslint-disable react/destructuring-assignment */
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-class ClassInput extends Component {
-  constructor(props) {
-    super(props);
+// eslint-disable-next-line react/function-component-definition, react/prop-types
+const FunctionalInput = ({ name }) => {
+  const [todos, setTodos] = useState(['Just some demo tasks', 'As an example']);
+  const [inputVal, setInputVal] = useState('');
 
-    this.state = {
-      todos: ['Just some demo tasks', 'As an example'],
-      inputVal: '',
-      editingIndex: null, // Track which todo is being edited
-      editingVal: '',     // Track the value while editing
-    };
+  const handleInputChange = (e) => {
+    setInputVal(e.target.value);
+  };
 
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
-    this.handleEdit = this.handleEdit.bind(this);
-    this.handleEditChange = this.handleEditChange.bind(this);
-    this.handleEditSubmit = this.handleEditSubmit.bind(this);
-  }
-
-  handleInputChange(e) {
-    this.setState({ inputVal: e.target.value });
-  }
-
-  handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const trimmedVal = this.state.inputVal.trim();
-    if (trimmedVal !== '') {
-      this.setState((state) => ({
-        todos: [...state.todos, trimmedVal],
-        inputVal: '',
-      }));
+    if (inputVal.trim() !== '') {
+      setTodos((prevTodos) => [...prevTodos, inputVal]);
+      setInputVal('');
     }
-  }
+  };
 
-  handleDelete(index) {
-    this.setState((state) => ({
-      todos: state.todos.filter((_, i) => i !== index),
-    }));
-  }
+  const handleDeleteSubmit = (e) => {
+    e.preventDefault();
+    setTodos((prevTodos) => prevTodos.slice(0, -1)); // remove the last todo
+  };
 
-  handleEdit(index) {
-    this.setState({
-      editingIndex: index,
-      editingVal: this.state.todos[index],
-    });
-  }
+  return (
+    <section>
+      <h3>{name}</h3>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="task-entry">Enter a task: </label>
+        <input
+          type="text"
+          name="task-entry"
+          value={inputVal}
+          onChange={handleInputChange}
+        />
+        <button type="submit">Submit</button>
+        <button type="button" onClick={handleDeleteSubmit} disabled={todos.length === 0}>
+          Delete
+        </button>
+      </form>
 
-  handleEditChange(e) {
-    this.setState({ editingVal: e.target.value });
-  }
+      <h4>All the tasks!</h4>
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>{todo}</li> // Using index as key because text might repeat
+        ))}
+      </ul>
+    </section>
+  );
+};
 
-  handleEditSubmit(index) {
-    const trimmedVal = this.state.editingVal.trim();
-    if (trimmedVal !== '') {
-      this.setState((state) => {
-        const newTodos = [...state.todos];
-        newTodos[index] = trimmedVal;
-        return {
-          todos: newTodos,
-          editingIndex: null,
-          editingVal: '',
-        };
-      });
-    }
-  }
-
-  render() {
-    return (
-      <section>
-        {/* eslint-disable-next-line react/prop-types */}
-        <h3>{this.props.name}</h3>
-        <form onSubmit={this.handleSubmit}>
-          <label htmlFor="task-entry">Enter a task: </label>
-          <input
-            type="text"
-            name="task-entry"
-            value={this.state.inputVal}
-            onChange={this.handleInputChange}
-          />
-          <button type="submit">Submit</button>
-        </form>
-
-        {/* Show count component */}
-        <Count number={this.state.todos.length} />
-
-        <h4>All the tasks!</h4>
-        <ul>
-          {this.state.todos.map((todo, index) => (
-            <li key={index}>
-              {this.state.editingIndex === index ? (
-                <>
-                  <input
-                    type="text"
-                    value={this.state.editingVal}
-                    onChange={this.handleEditChange}
-                  />
-                  <button onClick={() => this.handleEditSubmit(index)}>Resubmit</button>
-                </>
-              ) : (
-                <>
-                  {todo}
-                  <button onClick={() => this.handleEdit(index)}>Edit</button>
-                  <button onClick={() => this.handleDelete(index)}>Delete</button>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
-    );
-  }
-}
-
-// New Count component
-class Count extends Component {
-  render() {
-    return (
-      <div style={{ marginTop: '1rem', fontWeight: 'bold' }}>
-        Total tasks: {this.props.number}
-      </div>
-    );
-  }
-}
-
-export default ClassInput;
+export default FunctionalInput;

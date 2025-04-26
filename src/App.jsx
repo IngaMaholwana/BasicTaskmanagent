@@ -1,5 +1,5 @@
 import React from 'react';
-import FunctionalInput from './components/FunctionalInput';
+import FunctionalInput from './components/FunctionInpt';
 import ClassInput from './components/ClassInput';
 import './style.css';
 
